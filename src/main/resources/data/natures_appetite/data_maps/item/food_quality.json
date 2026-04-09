@@ -1,0 +1,41 @@
+{
+  "replace": false,
+  "values": {
+    "minecraft:golden_carrot": {
+      "tier": 2,
+      "loveTimeBonusTicks": 60,
+      "healAmount": 2.0,
+      "babyGrowthBonusTicks": 1200,
+      "extraBabyChance": 0.1,
+      "signalRange": 12.0,
+      "signalDurationTicks": 120,
+      "specialDropChance": 0.35,
+      "specialDropMultiplier": 1.5,
+      "specialDropDurationTicks": 12000
+    },
+    "minecraft:golden_apple": {
+      "tier": 3,
+      "loveTimeBonusTicks": 100,
+      "healAmount": 4.0,
+      "babyGrowthBonusTicks": 2400,
+      "extraBabyChance": 0.16,
+      "signalRange": 16.0,
+      "signalDurationTicks": 160,
+      "specialDropChance": 0.45,
+      "specialDropMultiplier": 1.75,
+      "specialDropDurationTicks": 16000
+    },
+    "minecraft:enchanted_golden_apple": {
+      "tier": 4,
+      "loveTimeBonusTicks": 160,
+      "healAmount": 8.0,
+      "babyGrowthBonusTicks": 3600,
+      "extraBabyChance": 0.25,
+      "signalRange": 20.0,
+      "signalDurationTicks": 200,
+      "specialDropChance": 0.6,
+      "specialDropMultiplier": 2.0,
+      "specialDropDurationTicks": 20000
+    }
+  }
+}
