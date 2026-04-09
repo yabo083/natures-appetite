@@ -39,27 +39,49 @@ Main keys in `natures_appetite-server.toml`:
 
 Only entities in whitelist are enabled; blacklist always overrides whitelist.
 
-`data/natures_appetite/tags/entity_type/auto_feed_animals.json`
+Correct tag folder is `entity_types` (plural):
+
+- `data/natures_appetite/tags/entity_types/auto_feed_animals.json`
+- `data/natures_appetite/tags/entity_types/auto_feed_blacklist.json`
+
+Datapacks should be placed in your world save folder:
+
+- `<minecraft>/saves/<world_name>/datapacks/<your_pack>/...`
+
+### Example: Enable Bees
+
+Bees are valid targets when they are in the whitelist and can find valid food (flowers).
+
+Datapack tree:
+
+```text
+<minecraft>/saves/<world_name>/datapacks/natures_appetite_bees/
+  pack.mcmeta
+  data/
+    natures_appetite/
+      tags/
+        entity_types/
+          auto_feed_animals.json
+```
+
+`pack.mcmeta`
 
 ```json
 {
-  "replace": true,
-  "values": [
-    "minecraft:cow",
-    "minecraft:sheep",
-    "minecraft:pig",
-    "minecraft:chicken"
-  ]
+  "pack": {
+    "pack_format": 15,
+    "description": "Enable Nature's Appetite auto-feed for bees"
+  }
 }
 ```
 
-`data/natures_appetite/tags/entity_type/auto_feed_blacklist.json`
+`data/natures_appetite/tags/entity_types/auto_feed_animals.json`
 
 ```json
 {
-  "replace": true,
+  "replace": false,
   "values": [
-    "minecraft:pig"
+    "minecraft:bee"
   ]
 }
 ```

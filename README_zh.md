@@ -37,27 +37,49 @@ Nature's Appetite 是一个 Forge 1.20.1 模组，用于自动化畜牧投喂与
 
 只有在白名单中的动物会生效；黑名单最终否决（优先级更高）。
 
-`data/natures_appetite/tags/entity_type/auto_feed_animals.json`
+标签目录应为 `entity_types`（复数）：
+
+- `data/natures_appetite/tags/entity_types/auto_feed_animals.json`
+- `data/natures_appetite/tags/entity_types/auto_feed_blacklist.json`
+
+数据包应放在存档目录下：
+
+- `<minecraft>/saves/<世界名>/datapacks/<你的数据包>/...`
+
+### 示例：让蜜蜂生效
+
+把 `minecraft:bee` 加入白名单后，蜜蜂即可参与自动觅食（以花为食物）。
+
+目录结构：
+
+```text
+<minecraft>/saves/<世界名>/datapacks/natures_appetite_bees/
+  pack.mcmeta
+  data/
+    natures_appetite/
+      tags/
+        entity_types/
+          auto_feed_animals.json
+```
+
+`pack.mcmeta`
 
 ```json
 {
-  "replace": true,
-  "values": [
-    "minecraft:cow",
-    "minecraft:sheep",
-    "minecraft:pig",
-    "minecraft:chicken"
-  ]
+  "pack": {
+    "pack_format": 15,
+    "description": "让 Nature's Appetite 对蜜蜂启用自动投喂"
+  }
 }
 ```
 
-`data/natures_appetite/tags/entity_type/auto_feed_blacklist.json`
+`data/natures_appetite/tags/entity_types/auto_feed_animals.json`
 
 ```json
 {
-  "replace": true,
+  "replace": false,
   "values": [
-    "minecraft:pig"
+    "minecraft:bee"
   ]
 }
 ```
