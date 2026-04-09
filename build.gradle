@@ -4,6 +4,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.neoforged.gradle.userdev' version '7.0.170'
+    id 'com.modrinth.minotaur' version '2.+'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -177,3 +178,18 @@ idea {
         downloadJavadoc = true
     }
 }
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = (project.findProperty("modrinth_project_id") ?: "").toString()
+    versionNumber = project.mod_version
+    versionName = "v${project.mod_version}"
+    versionType = "release"
+    uploadFile = jar
+    gameVersions = [project.minecraft_version]
+    loaders = ["neoforge"]
+    changelog = System.getenv("CHANGELOG") ?: "Automated release for v${project.mod_version}"
+    syncBodyFrom = rootProject.file("README.md").text
+}
+
+tasks.modrinth.dependsOn(tasks.modrinthSyncBody)

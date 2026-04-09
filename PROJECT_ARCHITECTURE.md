@@ -10,7 +10,7 @@ Nature's Appetite is a NeoForge 1.21.1 gameplay automation mod focused on husban
 
 Primary requirement source:
 
-- `C:\Users\yabo\OneDrive\未来-终极愿景\编程\项目\MCMod开发\MCMod：Nature's Appetite\生灵食性开发日记.md`
+- Local product requirement journal (`生灵食性开发日记.md`, private workspace path omitted)
 
 External knowledge sources used during implementation:
 
@@ -35,6 +35,7 @@ Build system and runtime notes:
 - Access Transformer enabled for `Mob.goalSelector` goal injection.
 - JUnit 5 enabled for JVM test source set.
 - GameTest server run is wired and verified.
+- Modrinth Gradle plugin (`com.modrinth.minotaur`) is wired for release publishing.
 
 ## 3. Runtime Architecture
 
@@ -185,3 +186,12 @@ Future optional hardening:
 - richer GameTests for full in-world breeding assertions
 - stricter attribution model beyond owner/nearby fallback
 - optional telemetry hooks for large-farm profiling
+
+## 8. Delivery Pipeline
+
+- Workflow file: `.github/workflows/build.yml`
+- `push` / `pull_request` on `main`: compile and test (`./gradlew build`)
+- `tag` push (`v*`): build + GitHub Release + Modrinth publish + CurseForge publish
+- Release credentials contract:
+  - secrets: `MODRINTH_TOKEN`, `CURSEFORGE_TOKEN`
+  - repository variables: `MODRINTH_PROJECT_ID`, `CURSEFORGE_PROJECT_ID`

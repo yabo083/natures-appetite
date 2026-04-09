@@ -1,27 +1,72 @@
+# Nature's Appetite
 
-Installation information
-=======
+# Overview
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions at [github](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+Nature's Appetite is a NeoForge 1.21.1 mod that automates animal feeding and breeding:
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+- Animals can seek and eat dropped breeding food automatically.
+- Adult feeding is gated by breeding cooldown (`age == 0`) to prevent continuous waste.
+- Baby animals can continuously eat (configurable) to speed up growth.
+- Food quality is data-driven and can add healing, love-time bonus, growth bonus, extra baby chance, herd signals, and temporary special drops.
 
-> **Note**: For Eclipse, use tasks in `Launch Group` instead of ones founds in `Java Application`. A preparation task must run before launching the game. NeoGradle uses launch groups to do these subsequently.
+### Current Features
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+- Auto-feed goal injection for whitelist animals.
+- Tag-driven whitelist/blacklist control.
+- Owner attribution for breeding credit.
+- Data Map based quality system.
+- Per-level dropped-item candidate tracker for better farm performance.
+- GameTest + unit test scaffolding.
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+### Server Config Keys
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+Main keys in `natures_appetite-server.toml`:
+
+- `enableAutoFeed`
+- `enableAdultContinuousFeeding`
+- `enableBabyContinuousFeeding`
+- `scanRadius`
+- `scanIntervalMin`
+- `scanIntervalMax`
+- `maxCandidatesPerScan`
+- `pathTimeoutTicks`
+- `ownerAttributionRange`
+- `enableQualitySystem`
+- `enablePackBehavior`
+- `enableSpecialDrops`
+
+### Datapack Tags
+
+Only entities in whitelist are enabled; blacklist always overrides whitelist.
+
+`data/natures_appetite/tags/entity_type/auto_feed_animals.json`
+
+```json
+{
+  "replace": true,
+  "values": [
+    "minecraft:cow",
+    "minecraft:sheep",
+    "minecraft:pig",
+    "minecraft:chicken"
+  ]
+}
+```
+
+`data/natures_appetite/tags/entity_type/auto_feed_blacklist.json`
+
+```json
+{
+  "replace": true,
+  "values": [
+    "minecraft:pig"
+  ]
+}
+```
+
+Apply datapack changes:
+
+```mcfunction
+/reload
+/datapack list
+```
