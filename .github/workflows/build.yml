@@ -102,4 +102,4 @@ jobs:
           project_id: ${{ env.CURSEFORGE_PROJECT_ID }}
           game_endpoint: minecraft
           file_path: ${{ steps.release_jar.outputs.jar_path }}
-          game_versions: "Minecraft 1.21:1.21.1,Java 21,NeoForge"
+          game_versions: "Minecraft 1.20:1.20.1,Java 17,Forge"

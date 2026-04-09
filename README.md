@@ -2,7 +2,7 @@
 
 # Overview
 
-Nature's Appetite is a NeoForge 1.21.1 mod that automates animal feeding and breeding:
+Nature's Appetite is a Forge 1.20.1 mod that automates animal feeding and breeding:
 
 - Animals can seek and eat dropped breeding food automatically.
 - Adult feeding is gated by breeding cooldown (`age == 0`) to prevent continuous waste.
@@ -14,7 +14,7 @@ Nature's Appetite is a NeoForge 1.21.1 mod that automates animal feeding and bre
 - Auto-feed goal injection for whitelist animals.
 - Tag-driven whitelist/blacklist control.
 - Owner attribution for breeding credit.
-- Data Map based quality system.
+- Reloadable JSON-based quality system (`data_maps/item/food_quality.json`).
 - Per-level dropped-item candidate tracker for better farm performance.
 - GameTest + unit test scaffolding.
 

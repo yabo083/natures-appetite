@@ -20,16 +20,16 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
-import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
+import net.minecraftforge.event.RegisterGameTestsEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
+import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@EventBusSubscriber(modid = NaturesAppetiteMod.MODID)
+@Mod.EventBusSubscriber(modid = NaturesAppetiteMod.MODID)
 public final class ModGameplayEvents {
     private static final int EXTRA_BABY_GROWTH_FALLBACK = -24000;
 
@@ -90,8 +90,14 @@ public final class ModGameplayEvents {
 
     @SubscribeEvent
     public static void onEntityLeaveLevel(EntityLeaveLevelEvent event) {
-        if (event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof ItemEntity itemEntity) {
+        if (!(event.getLevel() instanceof ServerLevel level)) {
+            return;
+        }
+        if (event.getEntity() instanceof ItemEntity itemEntity) {
             DroppedItemTracker.trackLeave(level, itemEntity);
+        }
+        if (event.getEntity() instanceof Animal animal) {
+            ModAttachments.remove(animal);
         }
     }
 
@@ -99,6 +105,7 @@ public final class ModGameplayEvents {
     public static void onLevelUnload(LevelEvent.Unload event) {
         if (event.getLevel() instanceof ServerLevel serverLevel) {
             DroppedItemTracker.clearLevel(serverLevel);
+            ModAttachments.clearLevel(serverLevel);
         }
     }
 
@@ -172,12 +179,14 @@ public final class ModGameplayEvents {
 
             int baseCount = drop.getItem().getCount();
             int bonusCount = Math.max(1, Math.round(baseCount * (multiplier - 1.0F)));
+            var bonusStack = drop.getItem().copy();
+            bonusStack.setCount(bonusCount);
             ItemEntity extraDrop = new ItemEntity(
                     level,
                     drop.getX(),
                     drop.getY(),
                     drop.getZ(),
-                    drop.getItem().copyWithCount(bonusCount));
+                    bonusStack);
             extraDrops.add(extraDrop);
         }
         event.getDrops().addAll(extraDrops);

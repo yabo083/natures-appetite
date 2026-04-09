@@ -146,7 +146,8 @@ public final class AutoFeedDroppedFoodGoal extends Goal {
             return;
         }
 
-        ItemStack consumed = stack.copyWithCount(1);
+        ItemStack consumed = stack.copy();
+        consumed.setCount(1);
         stack.shrink(1);
         if (stack.isEmpty()) {
             consumedItem.discard();

@@ -2,7 +2,7 @@
 
 ## 1. Project Intent and Source Materials
 
-Nature's Appetite is a NeoForge 1.21.1 gameplay automation mod focused on husbandry QoL:
+Nature's Appetite is a Forge 1.20.1 gameplay automation mod focused on husbandry QoL:
 
 - Animals automatically seek and consume dropped breeding food.
 - Successful auto-feeding triggers love mode and can complete breeding without player right-click.
@@ -14,19 +14,16 @@ Primary requirement source:
 
 External knowledge sources used during implementation:
 
-- NeoForge Getting Started 1.21.1
-- NeoForge Event system (1.21.1 line)
-- NeoForge Data Maps (server resources)
-- NeoForge Data Attachments (datastorage)
-- NeoForge Tags (server resources)
-- NeoForge 21.1.x Javadocs for `EntityJoinLevelEvent`, `Animal`, `GoalSelector`, `ItemEntity`, `BabyEntitySpawnEvent`
-- NeoForge `Tags.java`, `EventHooks.java`, and Maven metadata (`21.1.x` latest patchline)
+- ForgeGradle 6.x docs
+- Forge 1.20.1 MDK template (`build.gradle` / `gradle.properties`)
+- Forge event system (1.20.1 line)
+- Forge Maven metadata (`net.minecraftforge:forge` 1.20.1 patchline)
 
 ## 2. Version and Build Baseline
 
-- Minecraft: `1.21.1`
-- NeoForge: `21.1.224`
-- Java toolchain: `21`
+- Minecraft: `1.20.1`
+- Forge: `47.4.18`
+- Java toolchain: `17`
 - Mod ID: `natures_appetite`
 - Package root: `com.naturesappetite.natures_appetite`
 
@@ -35,7 +32,7 @@ Build system and runtime notes:
 - Access Transformer enabled for `Mob.goalSelector` goal injection.
 - JUnit 5 enabled for JVM test source set.
 - GameTest server run is wired and verified.
-- Modrinth Gradle plugin (`com.modrinth.minotaur`) is wired for release publishing.
+- Modrinth Gradle plugin (`com.modrinth.minotaur`) is wired for release publishing (`loader=forge`).
 
 ## 3. Runtime Architecture
 
@@ -48,7 +45,7 @@ Build system and runtime notes:
 5. Feed trigger policy is age-aware:
    - Adult: must be enabled in config, must have `age == 0` (no breeding cooldown), and must pass `canFallInLove()`.
    - Baby: controlled by a dedicated continuous-feed switch; consumption accelerates growth via `ageUp`.
-6. Quality data (DataMap) optionally applies extra effects:
+6. Quality data (reloadable JSON map) optionally applies extra effects:
    - healing
    - extra love duration
    - baby growth bonus
@@ -61,8 +58,8 @@ Build system and runtime notes:
 - `config`: server config keys and accessors (`NaturesAppetiteServerConfig`)
 - `ai`: feeding state machine goal (`AutoFeedDroppedFoodGoal`)
 - `event`: runtime wiring, injection, breeding bonus, drop bonus, gametest registration (`ModGameplayEvents`)
-- `attachment`: per-animal runtime state (`AnimalFeedState`, `ModAttachments`)
-- `datamap`: item quality schema and type registration (`FoodQualityEntry`, `ModDataMaps`)
+- `attachment`: per-animal runtime state cache (`AnimalFeedState`, `ModAttachments`, backed by `WeakHashMap<Animal, AnimalFeedState>`)
+- `datamap`: item quality schema and Forge reload listener (`FoodQualityEntry`, `ModDataMaps`)
 - `tag`: supported/blacklist entity tags (`ModTags`)
 - `util`: candidate cache, player attribution, quality resolving
 - `gametest`: minimal integration test class
@@ -82,7 +79,7 @@ Build system and runtime notes:
 - Entity scope is data-driven by tags:
   - `natures_appetite:auto_feed_animals` (default farm whitelist)
   - `natures_appetite:auto_feed_blacklist` (hard deny)
-- Quality lookup uses DataMap with fallback for `#c:foods/golden` semantic items.
+- Quality lookup uses reloadable JSON data (`data_maps/item/food_quality.json`) with hardcoded fallback for golden foods.
 
 ## 4. Public Contracts
 
@@ -102,11 +99,15 @@ Build system and runtime notes:
 - `enableSpecialDrops`
 - `goalPriority`
 
-### 4.2 DataMap
+### 4.2 Quality Data Contract
 
-- ID: `natures_appetite:food_quality`
-- Registry: `item`
-- Codec fields:
+- Source path: `data/<namespace>/data_maps/item/*.json`
+- Built-in file: `data/natures_appetite/data_maps/item/food_quality.json`
+- Loader model:
+  - Files are merged in reload order.
+  - `"replace": true` clears previously merged entries.
+  - `values` object maps item id -> `FoodQualityEntry`.
+- `FoodQualityEntry` codec fields:
   - `tier`
   - `loveTimeBonusTicks`
   - `healAmount`
@@ -118,10 +119,13 @@ Build system and runtime notes:
   - `specialDropMultiplier`
   - `specialDropDurationTicks`
 
-### 4.3 Attachment
+### 4.3 Per-Animal Runtime State Cache
 
-- ID: `natures_appetite:animal_feed_state`
-- Holder: `Animal`
+- Storage: in-memory weak map keyed by `Animal` instance
+- Lifecycle:
+  - created lazily on first `ModAttachments.get(animal)`
+  - explicit remove on `EntityLeaveLevelEvent` (animal branch)
+  - level-scope cleanup on `LevelEvent.Unload`
 - Stored state:
   - next scan scheduling
   - blocked target backoff
@@ -147,8 +151,12 @@ Build system and runtime notes:
   - inject goal into supported animals
 - `EntityLeaveLevelEvent`
   - untrack removed `ItemEntity`
+  - clear animal runtime state cache entry
 - `LevelEvent.Unload`
   - clear level tracker state
+  - clear level animal state cache
+- `AddReloadListenerEvent`
+  - register food quality JSON reload listener
 - `BabyEntitySpawnEvent`
   - consume pending quality bonuses for growth and extra child chance
 - `LivingDropsEvent`
@@ -160,14 +168,15 @@ Build system and runtime notes:
 
 Executed and passing:
 
+- `.\gradlew.bat compileJava -x test`
 - `.\gradlew.bat test`
-- `.\gradlew.bat runGameTestServer`
+- `.\gradlew.bat build`
 
 Current test coverage:
 
 - Unit test: `FoodQualityEntry` codec/default behavior
 - Unit test: `FeedEligibilityRules` adult/baby feeding gate logic
-- GameTest: framework wiring and template loading smoke test
+- GameTest class and registration are wired; runtime GameTest server execution should be done in a game runtime environment.
 
 ## 7. Planned Growth (Aligned with Initial Roadmap)
 

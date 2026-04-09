@@ -1,25 +1,32 @@
 package com.naturesappetite.natures_appetite.attachment;
 
-import com.naturesappetite.natures_appetite.NaturesAppetiteMod;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.animal.Animal;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public final class ModAttachments {
-    public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(
-            NeoForgeRegistries.Keys.ATTACHMENT_TYPES,
-            NaturesAppetiteMod.MODID);
-
-    public static final DeferredHolder<AttachmentType<?>, AttachmentType<AnimalFeedState>> ANIMAL_FEED_STATE = ATTACHMENT_TYPES.register(
-            "animal_feed_state",
-            () -> AttachmentType.builder(AnimalFeedState::new).build());
+    private static final Map<Animal, AnimalFeedState> STATES = Collections.synchronizedMap(new WeakHashMap<>());
 
     private ModAttachments() {
     }
 
     public static AnimalFeedState get(Animal animal) {
-        return animal.getData(ANIMAL_FEED_STATE);
+        synchronized (STATES) {
+            return STATES.computeIfAbsent(animal, key -> new AnimalFeedState());
+        }
+    }
+
+    public static void remove(Animal animal) {
+        synchronized (STATES) {
+            STATES.remove(animal);
+        }
+    }
+
+    public static void clearLevel(ServerLevel level) {
+        synchronized (STATES) {
+            STATES.keySet().removeIf(animal -> animal == null || !animal.isAlive() || animal.level() == level);
+        }
     }
 }

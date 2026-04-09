@@ -13,7 +13,8 @@ class FoodQualityEntryTest {
     void codecUsesDefaultValuesWhenFieldsMissing() {
         JsonObject emptyObject = new JsonObject();
         FoodQualityEntry decoded = FoodQualityEntry.CODEC.parse(JsonOps.INSTANCE, emptyObject)
-                .getOrThrow();
+                .getOrThrow(false, message -> {
+                });
 
         assertEquals(FoodQualityEntry.NONE, decoded);
     }

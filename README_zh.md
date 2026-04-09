@@ -1,6 +1,6 @@
 简介
 
-Nature's Appetite 是一个 NeoForge 1.21.1 模组，用于自动化畜牧投喂与繁殖：
+Nature's Appetite 是一个 Forge 1.20.1 模组，用于自动化畜牧投喂与繁殖：
 
 - 动物可自动寻找并食用地面掉落的可繁殖食物。
 - 成年动物受繁殖冷却约束（`age == 0` 才会进食），避免持续吞粮浪费。
@@ -12,7 +12,7 @@ Nature's Appetite 是一个 NeoForge 1.21.1 模组，用于自动化畜牧投喂
 - 白名单动物自动注入自动进食 AI。
 - 白名单/黑名单标签控制生效范围。
 - 投喂归属玩家追踪（繁殖归因）。
-- Data Map 品质系统。
+- 可重载 JSON 品质系统（`data_maps/item/food_quality.json`）。
 - Level 级掉落物候选追踪，降低农场扫描开销。
 - 已接入 GameTest 与单元测试基础。
 
